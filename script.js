@@ -305,7 +305,7 @@ if (resultScreen) {
         // Update sub text
         const sub = document.getElementById('result-sub');
         if (sub) sub.textContent = `Số báo danh ${formatCandidateId(normalized.candidateId)}`;
-        setResultStatus(`Đã lấy dữ liệu từ ${REGION_LABELS[searchResult.region] || searchResult.region}.`, 'success');
+        setResultStatus('', '');
         return;
       }
 
