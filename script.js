@@ -6,7 +6,6 @@ const backButton = document.getElementById('back-button');
 const searchAnotherButton = document.getElementById('search-another');
 const candidateInput = document.getElementById('candidate-id');
 const searchFeedback = document.getElementById('search-feedback');
-const resultStatus = document.getElementById('result-status');
 
 const resultFields = {
   name: document.getElementById('result-name'),
@@ -58,19 +57,6 @@ function setSearchFeedback(message = '', tone = '') {
 
   if (tone === 'error') {
     searchFeedback.classList.add('is-error');
-  }
-}
-
-function setResultStatus(message = '', tone = '') {
-  resultStatus.textContent = message;
-  resultStatus.className = 'result-status';
-
-  if (tone === 'error') {
-    resultStatus.classList.add('is-error');
-  } else if (tone === 'success') {
-    resultStatus.classList.add('is-success');
-  } else if (tone === 'loading') {
-    resultStatus.classList.add('is-loading');
   }
 }
 
@@ -280,14 +266,12 @@ if (resultScreen) {
     const normalized = normalizeCandidateInput(rawId);
 
     if (normalized.error) {
-      setResultStatus(normalized.error, 'error');
       setResultSectionsVisible(false);
       return;
     }
 
     setResultSectionsVisible(true);
     clearResultFields();
-    setResultStatus('Đang tra cứu dữ liệu...', 'loading');
     setLoadingState(true);
 
     try {
@@ -298,19 +282,12 @@ if (resultScreen) {
         // Update sub text
         const sub = document.getElementById('result-sub');
         if (sub) sub.textContent = `Số báo danh ${formatCandidateId(normalized.candidateId)}`;
-        setResultStatus('', '');
         return;
       }
 
       clearResultFields();
-      setResultStatus('Không tìm thấy số báo danh.', 'error');
     } catch (error) {
       clearResultFields();
-      if (isConnectionError(error)) {
-        setResultStatus('Khu vực đang bảo trì.', 'error');
-      } else {
-        setResultStatus(error instanceof Error ? error.message : 'Khu vực đang bảo trì.', 'error');
-      }
     } finally {
       setLoadingState(false);
     }

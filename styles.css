@@ -850,11 +850,19 @@ input {
     width: 44px;
     justify-content: center;
     display: grid;
+    border-radius: 999px;
   }
 
   .topbar--result .back-button {
     min-width: 44px;
     padding: 0;
+    background: linear-gradient(180deg, #15c48a 0%, #08996b 100%);
+    border: 1px solid rgba(0, 179, 122, 0.28);
+  }
+
+  .topbar--result .back-button svg {
+    width: 22px;
+    height: 22px;
   }
 
   .back-button span {
