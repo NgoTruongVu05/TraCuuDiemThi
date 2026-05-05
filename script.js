@@ -24,6 +24,14 @@ const resultSections = [
   document.getElementById('result-scores'),
 ];
 
+const SBD_MIN = 1;
+const SBD_MAX = 1000;
+const NORTH_MAX = 500;
+const REGION_LABELS = {
+  MienBac: 'Miền Bắc',
+  MienNam: 'Miền Nam',
+};
+
 const PROJECT_CONFIG = window.__SUPABASE_CONFIG__ || {};
 const SUPABASE_CLIENTS = [];
 
@@ -103,7 +111,47 @@ function formatScore(value) {
 }
 
 function formatCandidateId(value) {
-  return String(value).padStart(8, '0');
+  return String(value);
+}
+
+function getRegionForCandidateId(candidateId) {
+  if (candidateId >= SBD_MIN && candidateId <= NORTH_MAX) {
+    return 'MienBac';
+  }
+
+  if (candidateId > NORTH_MAX && candidateId <= SBD_MAX) {
+    return 'MienNam';
+  }
+
+  return null;
+}
+
+function isConnectionError(error) {
+  return error instanceof Error && /DB_MienBac|DB_MienNam|fetch|network|failed to fetch|connection|timeout|supabase/i.test(error.message);
+}
+
+function normalizeCandidateInput(value) {
+  const trimmed = String(value || '').trim();
+
+  if (!trimmed) {
+    return { error: 'SBD không hợp lệ. Vui lòng nhập lại.' };
+  }
+
+  if (!/^\d+$/.test(trimmed)) {
+    return { error: 'SBD không hợp lệ. Vui lòng nhập lại.' };
+  }
+
+  const candidateId = Number(trimmed);
+
+  if (!Number.isInteger(candidateId)) {
+    return { error: 'SBD không hợp lệ. Vui lòng nhập lại.' };
+  }
+
+  if (candidateId < SBD_MIN || candidateId > SBD_MAX) {
+    return { error: 'Số báo danh phải từ 1 đến 1000.' };
+  }
+
+  return { candidateId };
 }
 
 function clearResultFields() {
@@ -140,6 +188,7 @@ function setLoadingState(isLoading) {
 }
 
 async function queryProject(region, client, candidateId) {
+  const dbName = region === 'MienBac' ? 'DB_MienBac' : 'DB_MienNam';
   const { data, error } = await client
     .from('ThiSinh')
     .select('MaSoThiSinh,HoTen,NgaySinh,DiaChi,DiemToan,DiemVan,DiemAnh')
@@ -147,7 +196,7 @@ async function queryProject(region, client, candidateId) {
     .limit(1);
 
   if (error) {
-    throw new Error(`${region}: ${error.message}`);
+    throw new Error(`${dbName}: ${error.message}`);
   }
 
   return {
@@ -157,52 +206,76 @@ async function queryProject(region, client, candidateId) {
 }
 
 async function findCandidate(candidateId) {
+  const region = getRegionForCandidateId(candidateId);
+
+  if (!region) {
+    return {
+      region: '',
+      record: null,
+      errors: [],
+    };
+  }
+
   if (!SUPABASE_CLIENTS.length) {
-    throw new Error('Chưa cấu hình Supabase cho MienBac/MienNam.');
+    throw new Error('Khu vực đang bảo trì.');
   }
 
-  const results = await Promise.allSettled(
-    SUPABASE_CLIENTS.map(({ region, client }) => queryProject(region, client, candidateId))
-  );
+  const regionEntry = SUPABASE_CLIENTS.find((item) => item.region === region);
 
-  const errors = [];
-
-  for (const item of results) {
-    if (item.status === 'fulfilled') {
-      if (item.value.record) {
-        return item.value;
-      }
-    } else if (item.reason instanceof Error) {
-      errors.push(item.reason.message);
-    } else {
-      errors.push('Lỗi truy vấn dữ liệu.');
-    }
+  if (!regionEntry) {
+    throw new Error('Khu vực đang bảo trì.');
   }
+
+  const searchResult = await queryProject(regionEntry.region, regionEntry.client, candidateId);
 
   return {
-    region: '',
-    record: null,
-    errors,
+    region: searchResult.region,
+    record: searchResult.record,
+    errors: [],
   };
 }
 
 if (searchForm) {
-  searchForm.addEventListener('submit', (event) => {
+  if (candidateInput) {
+    candidateInput.value = '';
+  }
+
+  searchForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const rawValue = (candidateInput?.value || '').replace(/\D/g, '').slice(0, 8);
+    const normalized = normalizeCandidateInput(candidateInput?.value || '');
 
     if (!candidateInput) return;
 
-    candidateInput.value = rawValue;
+    candidateInput.value = (candidateInput.value || '').trim();
 
-    if (rawValue.length !== 8) {
+    if (normalized.error) {
       candidateInput.focus();
-      setSearchFeedback('Vui lòng nhập đúng 8 chữ số.', 'error');
+      setSearchFeedback(normalized.error, 'error');
       return;
     }
 
-    // Redirect to result page with query param
-    window.location.href = `result.html?id=${encodeURIComponent(rawValue)}`;
+    setSearchFeedback('Đang kiểm tra dữ liệu...', '');
+    setLoadingState(true);
+
+    try {
+      const searchResult = await findCandidate(normalized.candidateId);
+
+      if (searchResult.record) {
+        window.location.href = `result.html?id=${encodeURIComponent(String(normalized.candidateId))}`;
+        return;
+      }
+
+      setSearchFeedback('Không tìm thấy số báo danh.', 'error');
+      candidateInput.focus();
+    } catch (error) {
+      if (isConnectionError(error)) {
+        setSearchFeedback('Khu vực đang bảo trì.', 'error');
+      } else {
+        setSearchFeedback(error instanceof Error ? error.message : 'Khu vực đang bảo trì.', 'error');
+      }
+    } finally {
+      setLoadingState(false);
+    }
   });
 }
 
@@ -211,41 +284,40 @@ if (resultScreen) {
   (async () => {
     const params = new URLSearchParams(window.location.search);
     const rawId = params.get('id') || '';
+    const normalized = normalizeCandidateInput(rawId);
 
-    if (!rawId) {
-      setResultStatus('Không có số báo danh để tra cứu.', 'error');
+    if (normalized.error) {
+      setResultStatus(normalized.error, 'error');
       setResultSectionsVisible(false);
       return;
     }
 
     setResultSectionsVisible(true);
     clearResultFields();
-    setResultStatus('Đang tra cứu dữ liệu từ MienBac và MienNam...', 'loading');
+    setResultStatus('Đang tra cứu dữ liệu...', 'loading');
     setLoadingState(true);
 
     try {
-      const searchResult = await findCandidate(Number(rawId));
+      const searchResult = await findCandidate(normalized.candidateId);
 
       if (searchResult.record) {
-        renderResult(searchResult.record, searchResult.region, rawId);
+        renderResult(searchResult.record, searchResult.region, normalized.candidateId);
         // Update sub text
         const sub = document.getElementById('result-sub');
-        if (sub) sub.textContent = `Số báo danh ${formatCandidateId(rawId)}`;
-        setResultStatus(`Đã lấy dữ liệu từ ${searchResult.region}.`, 'success');
+        if (sub) sub.textContent = `Số báo danh ${formatCandidateId(normalized.candidateId)}`;
+        setResultStatus(`Đã lấy dữ liệu từ ${REGION_LABELS[searchResult.region] || searchResult.region}.`, 'success');
         return;
       }
 
       clearResultFields();
-      setResultStatus(`Không tìm thấy kết quả cho SBD ${formatCandidateId(rawId)}.`, 'error');
-
-      if (searchResult.errors?.length) {
-        // If there's a searchFeedback on page, show it
-        setSearchFeedback(searchResult.errors.join(' | '), 'error');
-      }
+      setResultStatus('Không tìm thấy số báo danh.', 'error');
     } catch (error) {
       clearResultFields();
-      setResultStatus(error instanceof Error ? error.message : 'Không thể truy vấn dữ liệu.', 'error');
-      setSearchFeedback(error instanceof Error ? error.message : 'Không thể truy vấn dữ liệu.', 'error');
+      if (isConnectionError(error)) {
+        setResultStatus('Khu vực đang bảo trì.', 'error');
+      } else {
+        setResultStatus(error instanceof Error ? error.message : 'Khu vực đang bảo trì.', 'error');
+      }
     } finally {
       setLoadingState(false);
     }
