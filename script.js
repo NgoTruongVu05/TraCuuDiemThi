@@ -310,7 +310,9 @@ if (searchAnotherButton) {
   });
 }
 
-candidateInput.addEventListener('input', () => {
-  candidateInput.value = candidateInput.value.replace(/\D/g, '').slice(0, 8);
-  setSearchFeedback('');
-});
+if (candidateInput) {
+  candidateInput.addEventListener('input', () => {
+    candidateInput.value = candidateInput.value.replace(/\D/g, '').slice(0, 8);
+    setSearchFeedback('');
+  });
+}
