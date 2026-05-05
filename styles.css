@@ -559,18 +559,23 @@ input {
 .topbar--result .back-button {
   padding: 0 18px;
   min-width: 150px;
-  border: 1px solid rgba(0, 179, 122, 0.22);
-  background: linear-gradient(180deg, rgba(0, 179, 122, 0.16), rgba(0, 179, 122, 0.08));
-  color: #0a7b57;
-  box-shadow: 0 16px 30px rgba(0, 179, 122, 0.12);
+  border: 1px solid rgba(0, 179, 122, 0.32);
+  background: linear-gradient(180deg, #15c48a 0%, #08996b 100%);
+  color: #ffffff;
+  box-shadow: 0 18px 34px rgba(8, 153, 107, 0.24);
 }
 
 .topbar--result .back-button svg {
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.45));
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.15));
 }
 
 .topbar--result .back-button:hover {
-  box-shadow: 0 18px 34px rgba(0, 179, 122, 0.18);
+  box-shadow: 0 22px 40px rgba(8, 153, 107, 0.3);
+  filter: brightness(1.04);
+}
+
+.topbar--result .back-button span {
+  letter-spacing: 0.01em;
 }
 
 .back-button span {

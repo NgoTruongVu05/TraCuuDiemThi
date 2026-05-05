@@ -13,7 +13,6 @@ const resultFields = {
   id: document.getElementById('result-id'),
   birthdate: document.getElementById('result-birthdate'),
   address: document.getElementById('result-address'),
-  region: document.getElementById('result-region'),
   math: document.getElementById('result-math'),
   literature: document.getElementById('result-literature'),
   english: document.getElementById('result-english'),
@@ -27,10 +26,6 @@ const resultSections = [
 const SBD_MIN = 1;
 const SBD_MAX = 1000;
 const NORTH_MAX = 500;
-const REGION_LABELS = {
-  MienBac: 'Miền Bắc',
-  MienNam: 'Miền Nam',
-};
 
 const PROJECT_CONFIG = window.__SUPABASE_CONFIG__ || {};
 const SUPABASE_CLIENTS = [];
@@ -159,18 +154,16 @@ function clearResultFields() {
   resultFields.id.textContent = '—';
   resultFields.birthdate.textContent = '—';
   resultFields.address.textContent = '—';
-  resultFields.region.textContent = '—';
   resultFields.math.textContent = '—';
   resultFields.literature.textContent = '—';
   resultFields.english.textContent = '—';
 }
 
-function renderResult(record, region, searchedId) {
+function renderResult(record, searchedId) {
   resultFields.name.textContent = record.HoTen || '—';
   resultFields.id.textContent = formatCandidateId(searchedId);
   resultFields.birthdate.textContent = formatDate(record.NgaySinh);
   resultFields.address.textContent = record.DiaChi || '—';
-  resultFields.region.textContent = region;
   resultFields.math.textContent = formatScore(record.DiemToan);
   resultFields.literature.textContent = formatScore(record.DiemVan);
   resultFields.english.textContent = formatScore(record.DiemAnh);
@@ -301,7 +294,7 @@ if (resultScreen) {
       const searchResult = await findCandidate(normalized.candidateId);
 
       if (searchResult.record) {
-        renderResult(searchResult.record, searchResult.region, normalized.candidateId);
+        renderResult(searchResult.record, normalized.candidateId);
         // Update sub text
         const sub = document.getElementById('result-sub');
         if (sub) sub.textContent = `Số báo danh ${formatCandidateId(normalized.candidateId)}`;
