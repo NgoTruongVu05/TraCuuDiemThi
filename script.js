@@ -1,7 +1,7 @@
 const searchScreen = document.querySelector('.screen-search');
 const resultScreen = document.querySelector('.screen-result');
 const searchForm = document.getElementById('search-form');
-const searchButton = searchForm.querySelector('button[type="submit"]');
+const searchButton = searchForm ? searchForm.querySelector('button[type="submit"]') : null;
 const backButton = document.getElementById('back-button');
 const searchAnotherButton = document.getElementById('search-another');
 const candidateInput = document.getElementById('candidate-id');
@@ -22,7 +22,6 @@ const resultFields = {
 const resultSections = [
   document.querySelector('.candidate-card'),
   document.getElementById('result-scores'),
-  document.querySelector('.result-note'),
 ];
 
 const PROJECT_CONFIG = window.__SUPABASE_CONFIG__ || {};
@@ -49,6 +48,8 @@ function showScreen(screen) {
 }
 
 function setSearchFeedback(message = '', tone = '') {
+  if (!searchFeedback) return;
+
   searchFeedback.textContent = message;
   searchFeedback.className = 'search-feedback';
 
@@ -72,10 +73,7 @@ function setResultStatus(message = '', tone = '') {
 
 function setResultSectionsVisible(visible) {
   resultSections.forEach((section) => {
-    if (!section) {
-      return;
-    }
-
+    if (!section) return;
     section.classList.toggle('is-hidden', !visible);
   });
 }
@@ -131,9 +129,14 @@ function renderResult(record, region, searchedId) {
 }
 
 function setLoadingState(isLoading) {
-  searchButton.disabled = isLoading;
-  searchButton.textContent = isLoading ? 'Đang tra cứu...' : 'Tra cứu ngay';
-  candidateInput.disabled = isLoading;
+  if (searchButton) {
+    searchButton.disabled = isLoading;
+    searchButton.textContent = isLoading ? 'Đang tra cứu...' : 'Tra cứu ngay';
+  }
+
+  if (candidateInput) {
+    candidateInput.disabled = isLoading;
+  }
 }
 
 async function queryProject(region, client, candidateId) {
@@ -183,60 +186,88 @@ async function findCandidate(candidateId) {
   };
 }
 
-searchForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const rawValue = candidateInput.value.replace(/\D/g, '').slice(0, 8);
+if (searchForm) {
+  searchForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const rawValue = (candidateInput?.value || '').replace(/\D/g, '').slice(0, 8);
 
-  candidateInput.value = rawValue;
+    if (!candidateInput) return;
 
-  if (rawValue.length !== 8) {
-    candidateInput.focus();
-    setSearchFeedback('Vui lòng nhập đúng 8 chữ số.', 'error');
-    return;
-  }
+    candidateInput.value = rawValue;
 
-  if (!SUPABASE_CLIENTS.length) {
-    setSearchFeedback('Chưa cấu hình Supabase. Hãy điền URL và anon key cho MienBac / MienNam.', 'error');
-    return;
-  }
-
-  setSearchFeedback('');
-  showScreen(resultScreen);
-  setResultSectionsVisible(true);
-  clearResultFields();
-  setResultStatus('Đang tra cứu dữ liệu từ MienBac và MienNam...', 'loading');
-  setLoadingState(true);
-
-  try {
-    const searchResult = await findCandidate(Number(rawValue));
-
-    if (searchResult.record) {
-      renderResult(searchResult.record, searchResult.region, rawValue);
-      setResultStatus(`Đã lấy dữ liệu từ ${searchResult.region}.`, 'success');
+    if (rawValue.length !== 8) {
+      candidateInput.focus();
+      setSearchFeedback('Vui lòng nhập đúng 8 chữ số.', 'error');
       return;
     }
 
-    clearResultFields();
-    setResultStatus(`Không tìm thấy kết quả cho SBD ${formatCandidateId(rawValue)}.`, 'error');
+    // Redirect to result page with query param
+    window.location.href = `result.html?id=${encodeURIComponent(rawValue)}`;
+  });
+}
 
-    if (searchResult.errors?.length) {
-      setSearchFeedback(searchResult.errors.join(' | '), 'error');
+// If we're on the result page, run the search using the id query param
+if (resultScreen) {
+  (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const rawId = params.get('id') || '';
+
+    if (!rawId) {
+      setResultStatus('Không có số báo danh để tra cứu.', 'error');
+      setResultSectionsVisible(false);
+      return;
     }
-  } catch (error) {
-    clearResultFields();
-    setResultStatus(error instanceof Error ? error.message : 'Không thể truy vấn dữ liệu.', 'error');
-    setSearchFeedback(error instanceof Error ? error.message : 'Không thể truy vấn dữ liệu.', 'error');
-  } finally {
-    setLoadingState(false);
-  }
-});
 
-backButton.addEventListener('click', () => showScreen(searchScreen));
-searchAnotherButton.addEventListener('click', () => {
-  showScreen(searchScreen);
-  candidateInput.focus();
-  candidateInput.select();
-});
+    setResultSectionsVisible(true);
+    clearResultFields();
+    setResultStatus('Đang tra cứu dữ liệu từ MienBac và MienNam...', 'loading');
+    setLoadingState(true);
+
+    try {
+      const searchResult = await findCandidate(Number(rawId));
+
+      if (searchResult.record) {
+        renderResult(searchResult.record, searchResult.region, rawId);
+        // Update sub text
+        const sub = document.getElementById('result-sub');
+        if (sub) sub.textContent = `Số báo danh ${formatCandidateId(rawId)}`;
+        setResultStatus(`Đã lấy dữ liệu từ ${searchResult.region}.`, 'success');
+        return;
+      }
+
+      clearResultFields();
+      setResultStatus(`Không tìm thấy kết quả cho SBD ${formatCandidateId(rawId)}.`, 'error');
+
+      if (searchResult.errors?.length) {
+        // If there's a searchFeedback on page, show it
+        setSearchFeedback(searchResult.errors.join(' | '), 'error');
+      }
+    } catch (error) {
+      clearResultFields();
+      setResultStatus(error instanceof Error ? error.message : 'Không thể truy vấn dữ liệu.', 'error');
+      setSearchFeedback(error instanceof Error ? error.message : 'Không thể truy vấn dữ liệu.', 'error');
+    } finally {
+      setLoadingState(false);
+    }
+  })();
+}
+
+if (backButton) {
+  backButton.addEventListener('click', () => {
+    // If we have history, go back; otherwise go to index
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = 'index.html';
+    }
+  });
+}
+
+if (searchAnotherButton) {
+  searchAnotherButton.addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
+}
 
 candidateInput.addEventListener('input', () => {
   candidateInput.value = candidateInput.value.replace(/\D/g, '').slice(0, 8);
