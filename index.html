@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1020" />
+    <title>Tra cứu điểm thi THPT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="screen screen-search active" aria-labelledby="search-title">
+        <header class="topbar" aria-label="Thanh điều hướng">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" focusable="false">
+              <path d="M14 26l18-10 18 10-18 10-18-10Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
+              <path d="M20 31v8c0 3.3 5.4 6 12 6s12-2.7 12-6v-8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+              <path d="M42 28v9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div class="topbar-copy">
+            <span>Tra cứu Điểm THPT</span>
+            <p>Năm học: 2025 - 2026</p>
+          </div>
+        </header>
+
+        <section class="screen-grid">
+          <div class="hero-card">
+            <div class="hero-badge mobile-only" aria-hidden="true">
+              <svg viewBox="0 0 64 64" focusable="false">
+                <path d="M14 26l18-10 18 10-18 10-18-10Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
+                <path d="M20 31v8c0 3.3 5.4 6 12 6s12-2.7 12-6v-8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <path d="M42 28v9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+              </svg>
+            </div>
+            <p class="eyebrow eyebrow--light">Cổng tra cứu chính thức</p>
+            <h1 id="search-title">Tra cứu Điểm Thi</h1>
+            <p class="hero-copy">Nhập số báo danh để xem kết quả chi tiết, phân tách theo từng môn và theo từng hội đồng thi.</p>
+            <div class="hero-stats" aria-label="Thông tin nổi bật">
+              <div>
+                <strong>8</strong>
+                <span>chữ số SBD</span>
+              </div>
+              <div>
+                <strong>20+</strong>
+                <span>môn & tổ hợp</span>
+              </div>
+              <div>
+                <strong>Real-time</strong>
+                <span>đồng bộ dữ liệu</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack-panel">
+            <form class="search-card" id="search-form">
+              <label for="candidate-id">Số báo danh</label>
+              <div class="input-wrap">
+                <span class="input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+                    <path d="M20 20l-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+                </span>
+                <input id="candidate-id" name="candidateId" inputmode="numeric" maxlength="8" placeholder="Nhập 8 chữ số..." value="01000001" />
+              </div>
+              <button type="submit" class="primary-button">Tra cứu ngay</button>
+            </form>
+
+            <section class="note-card" aria-labelledby="note-title">
+              <h2 id="note-title">Lưu ý thí sinh</h2>
+              <ul>
+                <li>SBD gồm 8 chữ số in trên giấy báo thi.</li>
+                <li>Nếu không thấy kết quả, vui lòng kiểm tra lại SBD.</li>
+                <li>Hệ thống cập nhật dữ liệu từ Bộ GD&amp;ĐT.</li>
+              </ul>
+            </section>
+          </div>
+        </section>
+
+        <footer class="page-footer desktop-only" aria-label="Chân trang">
+          <div class="footer-brand">
+            <div class="footer-logo" aria-hidden="true">
+              <svg viewBox="0 0 64 64" focusable="false">
+                <path d="M14 26l18-10 18 10-18 10-18-10Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <strong>ExamPoint Pro</strong>
+              <p>© 2026 Hệ thống Tra cứu Điểm thi Quốc gia</p>
+            </div>
+          </div>
+        </footer>
+      </section>
+
+      <section class="screen screen-result" aria-labelledby="result-title">
+        <header class="topbar topbar--result" aria-label="Thanh điều hướng kết quả">
+          <button class="back-button" id="back-button" type="button" aria-label="Quay lại trang tra cứu">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span>Quay lại tra cứu</span>
+          </button>
+          <div class="topbar-copy">
+            <span>Kết quả chi tiết</span>
+            <p>Số báo danh 01000001</p>
+          </div>
+        </header>
+
+        <section class="result-grid">
+          <article class="candidate-card">
+            <div class="candidate-card__glow candidate-card__glow--left" aria-hidden="true"></div>
+            <div class="candidate-card__glow candidate-card__glow--right" aria-hidden="true"></div>
+            <div class="candidate-card__top">
+              <div class="candidate-avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 13.2a4.2 4.2 0 1 0-4.2-4.2 4.2 4.2 0 0 0 4.2 4.2Zm0 2.1c-4.1 0-7.5 2.6-7.5 5.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div>
+                <span class="eyebrow">Thí sinh</span>
+                <h2>NGUYỄN VĂN A</h2>
+              </div>
+            </div>
+
+            <div class="candidate-meta">
+              <div>
+                <span>SBD</span>
+                <strong>01000001</strong>
+              </div>
+              <div>
+                <span>Hội đồng</span>
+                <strong>Hà Nội</strong>
+              </div>
+            </div>
+          </article>
+
+          <section class="scores-grid" aria-label="Bảng điểm">
+            <article class="score-card">
+              <span>Toán</span>
+              <strong class="score score-accent">8.40</strong>
+            </article>
+            <article class="score-card">
+              <span>Ngữ văn</span>
+              <strong class="score">7.50</strong>
+            </article>
+            <article class="score-card">
+              <span>Tiếng Anh</span>
+              <strong class="score score-accent">9.20</strong>
+            </article>
+            <article class="score-card">
+              <span>Vật lí</span>
+              <strong class="score score-accent">8.00</strong>
+            </article>
+            <article class="score-card">
+              <span>Hóa học</span>
+              <strong class="score">7.25</strong>
+            </article>
+            <article class="score-card">
+              <span>Sinh học</span>
+              <strong class="score">6.50</strong>
+            </article>
+          </section>
+
+          <section class="result-note desktop-only" aria-label="Thông báo kết quả">
+            <div class="result-note__icon" aria-hidden="true">
+              <svg viewBox="0 0 64 64" focusable="false">
+                <path d="M14 26l18-10 18 10-18 10-18-10Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
+                <path d="M20 31v8c0 3.3 5.4 6 12 6s12-2.7 12-6v-8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div>
+              <h3>Cánh cửa tương lai đang rộng mở</h3>
+              <p>Chúc mừng bạn đã hoàn thành kỳ thi quan trọng nhất. Hãy sử dụng kết quả này để xét tuyển vào các nguyện vọng mong muốn.</p>
+            </div>
+          </section>
+
+          <button type="button" class="secondary-button result-mobile-button mobile-only" id="search-another">Tra cứu số khác</button>
+
+          <footer class="page-footer desktop-only" aria-label="Chân trang">
+            <div class="footer-brand">
+              <div class="footer-logo" aria-hidden="true">
+                <svg viewBox="0 0 64 64" focusable="false">
+                  <path d="M14 26l18-10 18 10-18 10-18-10Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
+                </svg>
+              </div>
+              <div>
+                <strong>ExamPoint Pro</strong>
+                <p>© 2026 Hệ thống Tra cứu Điểm thi Quốc gia</p>
+              </div>
+            </div>
+          </footer>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
