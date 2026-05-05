@@ -325,19 +325,18 @@ if (resultScreen) {
 }
 
 if (backButton) {
+  function goToFreshIndex() {
+    window.location.replace(`index.html?fresh=${Date.now()}`);
+  }
+
   backButton.addEventListener('click', () => {
-    // If we have history, go back; otherwise go to index
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.location.href = 'index.html';
-    }
+    goToFreshIndex();
   });
 }
 
 if (searchAnotherButton) {
   searchAnotherButton.addEventListener('click', () => {
-    window.location.href = 'index.html';
+    window.location.replace(`index.html?fresh=${Date.now()}`);
   });
 }
 
