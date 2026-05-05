@@ -12,6 +12,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
   <body>
     <main class="app-shell">
@@ -71,6 +72,7 @@
                 <input id="candidate-id" name="candidateId" inputmode="numeric" maxlength="8" placeholder="Nhập 8 chữ số..." value="01000001" />
               </div>
               <button type="submit" class="primary-button">Tra cứu ngay</button>
+                <p class="search-feedback" id="search-feedback" aria-live="polite"></p>
             </form>
 
             <section class="note-card" aria-labelledby="note-title">
@@ -114,6 +116,7 @@
         </header>
 
         <section class="result-grid">
+            <div class="result-status" id="result-status" aria-live="polite"></div>
           <article class="candidate-card">
             <div class="candidate-card__glow candidate-card__glow--left" aria-hidden="true"></div>
             <div class="candidate-card__glow candidate-card__glow--right" aria-hidden="true"></div>
@@ -125,70 +128,66 @@
               </div>
               <div>
                 <span class="eyebrow">Thí sinh</span>
-                <h2>NGUYỄN VĂN A</h2>
+                <h2 id="result-name">Nguyễn Văn A</h2>
               </div>
             </div>
 
             <div class="candidate-meta">
               <div>
-                <span>SBD</span>
-                <strong>01000001</strong>
+                <span>Mã số thí sinh</span>
+                <strong id="result-id">01000001</strong>
               </div>
               <div>
-                <span>Hội đồng</span>
-                <strong>Hà Nội</strong>
+                <span>Ngày sinh</span>
+                <strong id="result-birthdate">15/03/2006</strong>
               </div>
+              <div>
+                <span>Địa chỉ</span>
+                <strong id="result-address">Hà Nội</strong>
+              </div>
+              <div>
+                <span>Khu vực</span>
+                <strong id="result-region">MienBac</strong>
+                  <h2 id="result-name">Nguyễn Văn A</h2>
             </div>
           </article>
 
           <section class="scores-grid" aria-label="Bảng điểm">
             <article class="score-card">
-              <span>Toán</span>
-              <strong class="score score-accent">8.40</strong>
+                  <span>Mã số thí sinh</span>
+                  <strong id="result-id">01000001</strong>
             </article>
             <article class="score-card">
-              <span>Ngữ văn</span>
-              <strong class="score">7.50</strong>
+                  <span>Ngày sinh</span>
+                  <strong id="result-birthdate">15/03/2006</strong>
             </article>
             <article class="score-card">
-              <span>Tiếng Anh</span>
-              <strong class="score score-accent">9.20</strong>
-            </article>
-            <article class="score-card">
-              <span>Vật lí</span>
-              <strong class="score score-accent">8.00</strong>
-            </article>
-            <article class="score-card">
-              <span>Hóa học</span>
-              <strong class="score">7.25</strong>
-            </article>
-            <article class="score-card">
-              <span>Sinh học</span>
-              <strong class="score">6.50</strong>
+                  <span>Địa chỉ</span>
+                  <strong id="result-address">Hà Nội</strong>
             </article>
           </section>
-
-          <section class="result-note desktop-only" aria-label="Thông báo kết quả">
+                  <span>Khu vực</span>
+                  <strong id="result-region">MienBac</strong>
             <div class="result-note__icon" aria-hidden="true">
               <svg viewBox="0 0 64 64" focusable="false">
                 <path d="M14 26l18-10 18 10-18 10-18-10Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
                 <path d="M20 31v8c0 3.3 5.4 6 12 6s12-2.7 12-6v-8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-              </svg>
+            <section class="scores-grid" aria-label="Bảng điểm" id="result-scores">
             </div>
             <div>
-              <h3>Cánh cửa tương lai đang rộng mở</h3>
+                <strong class="score score-accent" id="result-math">8.40</strong>
               <p>Chúc mừng bạn đã hoàn thành kỳ thi quan trọng nhất. Hãy sử dụng kết quả này để xét tuyển vào các nguyện vọng mong muốn.</p>
             </div>
           </section>
-
+                <strong class="score" id="result-literature">7.50</strong>
           <button type="button" class="secondary-button result-mobile-button mobile-only" id="search-another">Tra cứu số khác</button>
 
           <footer class="page-footer desktop-only" aria-label="Chân trang">
-            <div class="footer-brand">
+                <strong class="score score-accent" id="result-english">9.20</strong>
               <div class="footer-logo" aria-hidden="true">
                 <svg viewBox="0 0 64 64" focusable="false">
                   <path d="M14 26l18-10 18 10-18 10-18-10Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
-                </svg>
+            <section class="result-note desktop-only" aria-label="Thông báo kết quả">
               </div>
               <div>
                 <strong>ExamPoint Pro</strong>
@@ -199,6 +198,18 @@
         </section>
     </main>
 
+    <script>
+      window.__SUPABASE_CONFIG__ = {
+        MienBac: {
+          url: '',
+          anonKey: '',
+        },
+        MienNam: {
+          url: '',
+          anonKey: '',
+        },
+      };
+    </script>
     <script src="script.js"></script>
   </body>
 </html>
